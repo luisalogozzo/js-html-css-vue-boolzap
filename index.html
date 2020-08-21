@@ -24,13 +24,19 @@
 <!-- body -->
 <body>
   <div v-on:click="closeDropdown()" id="app">
-    <div id="deletePopup">
-      <h3>Eliminare messaggio?</h3>
-      <div class="deleteMsgBtn">
-        <button id="annullaBtn" type="button" name="button">ANNULLA</button>
-        <button id="eliminaBtn" type="button" name="button">ELIMINA</button>
+    <transition name="closePopup" >
+      <div id="deletePopupContainer" v-if="showContent == true">
+        <transition name="closePopupChild" @after-leave="showContent = false">
+          <div v-if="childPopup" id="deletePopup">
+            <h3>Eliminare messaggio?</h3>
+            <div class="deleteMsgBtn">
+              <button @click="cancel" id="annullaBtn" type="button" name="button">ANNULLA</button>
+              <button id="eliminaBtn" @click="deleteMessage(this.activeContact, this.selectedMessage)" type="button" name="button">ELIMINA</button>
+            </div>
+          </div>
+        </transition>
       </div>
-    </div>
+   </transition>
     <div id="background-header">
 
     </div>
@@ -119,11 +125,11 @@
         </div>
 
         <ul  v-for="(contact, index) in contacts" class="chat-messages list-style-none clearfix" v-if="(activeContact == index)">
-          <li v-for="(message, i) in contact.chat" :class='(message.sent) ? "message sent" : "message received"'>
-            <div class="msg-text">
+          <li @mouseenter="hoverAngleDown = i" @mouseleave="hoverAngleDown = null" v-for="(message, i) in contact.chat" :class='(message.sent) ? "message sent" : "message received"'>
+            <div  class="msg-text">
               <p  class="text">{{message.text}}</p>
               <transition name="angleDown">
-                  <svg class="angleDown" v-on:click.stop="toggleDropdown(i)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.3 4.6L9 10.3l5.7-5.7 1.6 1.6L9 13.4 1.7 6.2l1.6-1.6z"></path></svg>
+                <svg v-if="hoverAngleDown == i || activeDropdown == i" class="angleDown" v-on:click.stop="toggleDropdown(i)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.3 4.6L9 10.3l5.7-5.7 1.6 1.6L9 13.4 1.7 6.2l1.6-1.6z"></path></svg>
               </transition>
             </div>
 
@@ -131,7 +137,7 @@
               <transition v-bind:name="popupPosition">
                 <div v-if="(activeDropdown == i)" :class="'dropdown ' + popupPosition">
                   <p>info messaggio</p>
-                  <p @click="deleteMessage(index, i)">cancella messaggio</p>
+                  <p @click="openDeletePopup(index, i)">cancella messaggio</p>
                 </div>
               </transition>
               <time>{{message.time.format('kk:mm')}}
@@ -144,6 +150,8 @@
           </li>
         </ul>
       <!-- /messages -->
+
+
       <!-- footer -->
         <footer id="footer" class="header-top">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
@@ -162,7 +170,7 @@
             </svg>
           </span>
         </footer>
-        <!-- /footer -->
+      <!-- /footer -->
       </section>
     </div>
     <!-- template -->

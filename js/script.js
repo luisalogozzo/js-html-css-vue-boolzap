@@ -7,8 +7,12 @@ var app = new Vue(
       contactSearch: "",
       newMessage: "",
       activeContact: 0,
+      selectedMessage: null,
+      hoverAngleDown: null,
       activeDropdown: null,
       popupPosition: null,
+      showContent: false,
+      childPopup: false,
       contacts: [
         {
           image: "avatar_1.png",
@@ -162,16 +166,19 @@ var app = new Vue(
         }
       },
       deleteMessage(index, i) {
-        this.contacts[index].chat.splice(i, 1);
-        if (this.contacts[index].chat.length >= 1) {
-          this.OrganizeChatList(this.contacts[index]);
+        this.contacts[this.activeContact].chat.splice(i, 1);
+        if (this.contacts[this.activeContact].chat.length >= 1) {
+          this.OrganizeChatList(this.contacts[this.activeContact]);
         } else {
-          this.contacts[index].lastTime = ' ';
-          this.contacts[index].text = ' ';
-          this.contacts.splice(this.contacts.length, 0, this.contacts[index]);
-          this.contacts.splice(index, 1);
+          this.contacts[this.activeContact].lastTime = ' ';
+          this.contacts[this.activeContact].text = ' ';
+          this.contacts.splice(this.contacts.length, 0, this.contacts[this.activeContact]);
+          this.contacts.splice(this.activeContact, 1);
           this.activeContact = this.contacts.length - 1;
         }
+        this.showContent = false;
+        this.childPopup = false;
+
       },
       closeDropdown(){
         if (this.activeDropdown != null) {
@@ -181,8 +188,6 @@ var app = new Vue(
       toggleDropdown(i) {
         var container = this.$el.querySelector(".chat-messages");
         // console.log(this.$el.querySelector(".chat-messages li:last-child").getBoundingClientRect());
-
-
         if (this.activeDropdown != null) {
           this.activeDropdown = null;
         } else {
@@ -203,6 +208,15 @@ var app = new Vue(
              this.popupPosition = 'top-left';
            }
         }
+      },
+      openDeletePopup(index, i){
+        this.selectedMessage = i;
+        this.showContent = true;
+        this.childPopup = true;
+      },
+      cancel(){
+        this.showContent = false;
+        this.childPopup = false;
       }
     },
     mounted() {
