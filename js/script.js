@@ -176,7 +176,6 @@ var app = new Vue(
           this.contacts.splice(this.activeContact, 1);
           this.activeContact = this.contacts.length - 1;
         }
-        this.showContent = false;
         this.childPopup = false;
 
       },
@@ -215,7 +214,6 @@ var app = new Vue(
         this.childPopup = true;
       },
       cancel(){
-        this.showContent = false;
         this.childPopup = false;
       }
     },
